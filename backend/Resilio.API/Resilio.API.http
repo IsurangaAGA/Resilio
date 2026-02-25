@@ -1,0 +1,6 @@
+@Resilio.API_HostAddress = http://localhost:5217
+
+GET {{Resilio.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
