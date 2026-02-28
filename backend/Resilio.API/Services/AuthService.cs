@@ -23,6 +23,8 @@ public sealed class AuthService : IAuthService
     private readonly int _otpExpiryMinutes;
     private readonly int _refreshDays;
 
+    private readonly IEmailSender _emailSender;
+
     public AuthService(
         IUserRepository users,
         IOtpRepository otps,
@@ -30,6 +32,7 @@ public sealed class AuthService : IAuthService
         IJwtTokenService jwt,
         IOtpHasher otpHasher,
         IOtpGenerator otpGenerator,
+        IEmailSender emailSender,
         IRefreshTokenRepository refreshRepo,
         ITokenHasher tokenHasher,
         IRefreshTokenGenerator refreshGenerator,
@@ -46,6 +49,8 @@ public sealed class AuthService : IAuthService
         _refreshRepo = refreshRepo;
         _tokenHasher = tokenHasher;
         _refreshGenerator = refreshGenerator;
+
+        _emailSender = emailSender;
 
         _otpExpiryMinutes = int.TryParse(config["Otp:ExpiryMinutes"], out var m) ? m : 5;
         _refreshDays = int.TryParse(config["Auth:RefreshTokenDays"], out var d) ? d : 14;
@@ -75,8 +80,10 @@ public sealed class AuthService : IAuthService
             userAgent: userAgent,
             ct: ct);
 
-        // DEV ONLY (remove later)
-        Console.WriteLine($"[DEV ONLY] OTP for {identifier}: {otp}");
+        if (channel == "EMAIL" && identifier.Contains("@"))
+{
+    await _emailSender.SendOtpAsync(identifier, otp, ct);
+}
 
         return new AuthStartResponse("If this account exists, we sent a verification code.");
     }

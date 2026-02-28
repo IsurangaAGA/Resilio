@@ -5,6 +5,7 @@ using Resilio.Core.Interfaces;
 using Resilio.Infrastructure.Data;
 using Resilio.Infrastructure.Repositories;
 using System.Text;
+using Resilio.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,7 @@ builder.Services.AddSingleton<ITokenHasher>(sp =>
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IEmailSender, GmailEmailSender>();
 
 // JWT Auth
 var jwtKey = builder.Configuration["Auth:JwtKey"] ?? throw new InvalidOperationException("Auth:JwtKey missing.");
