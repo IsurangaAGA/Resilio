@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import styles from "./SecureAccessPage.module.css";
-import helpImg from "../assets/help.png"; // adjust path if needed
+import helpImg from "../assets/help.png"; 
+import AppHeader from "../components/AppHeader/AppHeader";
+
 
 export default function SecureAccessPage() {
   const nav = useNavigate();
@@ -38,6 +40,8 @@ export default function SecureAccessPage() {
   };
 
   return (
+    <>
+      <AppHeader />
     <div className={styles.page}>
       <div className={styles.shell}>
         <div className={styles.layout}>
@@ -220,5 +224,7 @@ export default function SecureAccessPage() {
         </div>
       </div>
     </div>
+
+  </>
   );
 }

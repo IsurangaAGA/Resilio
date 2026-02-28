@@ -4,6 +4,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import styles from "./ReliefHubHome.module.css";
+import AppHeader from "../components/AppHeader/AppHeader";
 
 // Put your image at: src/assets/resilio-help.png
 import heroBg from "../assets/resilio-help.png";
@@ -13,46 +14,9 @@ export default function ReliefHubHome() {
   const { setRole } = useAuth();
 
   return (
+     <>
+    <AppHeader />
     <div className={styles.page}>
-      {/* Top Nav */}
-      <header className={styles.navbar}>
-        <div className={styles.navInner}>
-          <div className={styles.brand}>
-            <div className={styles.logoMark} aria-hidden="true">
-              {/* Simple logo mark (replace with your SVG/img if you have one) */}
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 2l7 4v6c0 5-3.5 9.4-7 10-3.5-.6-7-5-7-10V6l7-4Z"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                />
-                <path
-                  d="M12 6v12"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M7 10h10"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-            <span className={styles.brandText}>Resilio</span>
-          </div>
-
-          <nav className={styles.navLinks}>
-            <a href="#home">HOME</a>
-            <a href="#about">ABOUT US</a>
-            <a href="#contact">CONTACT</a>
-            <a className={styles.navCta} href="#login">
-              LOGIN/REGISTER
-            </a>
-          </nav>
-        </div>
-      </header>
 
       {/* Hero */}
       <section
@@ -218,5 +182,6 @@ export default function ReliefHubHome() {
         </div>
       </section>
     </div>
+   </>  
   );
 }
