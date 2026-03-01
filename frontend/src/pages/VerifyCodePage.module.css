@@ -1,0 +1,162 @@
+.verifyPage {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 40px 16px;
+
+  /* Background */
+  background-image: url("D:\Resilio\frontend\src\assets\verify.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.card {
+  width: min(920px, 96vw);
+  padding: 48px 28px 34px;
+  text-align: center;
+
+  /* Subtle card look on top of background */
+  /* background: rgba(255, 255, 255, 0.866); */
+  backdrop-filter: blur(3px);
+  border-radius: 16px;
+
+  /* Glass + neumorphism */
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(14px);
+  box-shadow: 18px 18px 45px rgba(31, 38, 135, 0.1),
+    -18px -18px 45px rgba(255, 255, 255, 0.9);
+}
+
+.title {
+  margin: 0 0 10px;
+  font-size: clamp(28px, 3.4vw, 44px);
+  letter-spacing: 1px;
+  font-weight: 800;
+  color: #1f6fb3;
+}
+
+.subtitle {
+  margin: 0 auto 26px;
+  max-width: 720px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #4a5563;
+}
+
+.phone {
+  color: #6b7280;
+}
+
+.otpRow {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin: 18px 0 26px;
+  flex-wrap: wrap;
+}
+
+.otpBox {
+  width: 70px;
+  height: 74px;
+  border-radius: 10px;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  color: #6b7280;
+
+  border: 2px solid rgba(148, 163, 184, 0.6);
+  background: rgba(255, 255, 255, 0.85);
+  outline: none;
+
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.otpBoxActive {
+  border-style: dashed;
+  border-color: rgba(31, 111, 179, 0.55);
+}
+
+.otpBox:focus {
+  border-color: rgba(31, 111, 179, 0.9);
+  box-shadow: 0 0 0 4px rgba(31, 111, 179, 0.18);
+  transform: translateY(-1px);
+}
+
+.verifyBtn {
+  width: min(420px, 92%);
+  height: 56px;
+  border: none;
+  border-radius: 10px;
+
+  background: #1f6fb3;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+
+  cursor: pointer;
+  transition: transform 120ms ease, opacity 120ms ease, box-shadow 120ms ease;
+  box-shadow: 0 10px 22px rgba(31, 111, 179, 0.25);
+}
+
+.verifyBtn:hover {
+  transform: translateY(-1px);
+}
+
+.verifyBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.bottomRow {
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.linkBtn {
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px 10px;
+}
+
+.resendWrap {
+  text-align: left;
+  display: grid;
+  gap: 6px;
+}
+
+.resendText {
+  font-size: 14px;
+  color: #111827;
+}
+
+.resendBtn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 14px;
+  color: #111827;
+  cursor: pointer;
+}
+
+.resendDisabled {
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.resendTime {
+  color: #f59e0b; /* orange timer like the screenshot */
+  font-weight: 700;
+}
