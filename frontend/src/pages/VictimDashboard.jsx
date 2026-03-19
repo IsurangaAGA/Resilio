@@ -10,8 +10,8 @@ export default function VictimDashboard() {
       <h2>Victim Dashboard</h2>
       <p>✅ Logged in as: <b>{role}</b></p>
 
-      <button style={primaryBtn} onClick={() => alert("Placeholder: Request Help")}>
-        Request Help
+      <button style={primaryBtn} onClick={() => nav('/victim/new-request')}>
+      Request Help
       </button>
 
       <button

@@ -5,6 +5,7 @@ import OtpVerifyPage from "./pages/OtpVerifyPage";
 import VictimDashboard from "./pages/VictimDashboard";
 import VolunteerDashboard from "./pages/VolunteerDashboard";
 import ProtectedRoute from "./auth/ProtectedRoute";
+import NewRequestPage from './pages/victim/NewRequestPage';
 
 function App() {
   return (
@@ -13,6 +14,8 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth/start" element={<OtpStartPage />} />
         <Route path="/auth/verify" element={<OtpVerifyPage />} />
+        <Route path='/victim/new-request'element={<ProtectedRoute><NewRequestPage /></ProtectedRoute>} />
+        
 
         <Route
           path="/victim"
