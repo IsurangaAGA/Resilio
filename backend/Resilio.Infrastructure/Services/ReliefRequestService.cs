@@ -39,10 +39,22 @@ public sealed class ReliefRequestService : IReliefRequestService
         return ToResponse(created);
     }
 
-    // not yet implemented
-    // public Task<IReadOnlyList<ReliefRequestResponse>> GetAllAsync(
-    //     string? statusFilter, CancellationToken ct)
-    //     => throw new NotImplementedException();
+    // view
+    private static readonly HashSet<string> ValidStatuses =
+        new(StringComparer.OrdinalIgnoreCase)
+        { "Open", "Assigned", "Completed" };
+
+    public async Task<IReadOnlyList<ReliefRequestResponse>> GetAllAsync(
+        string? statusFilter, CancellationToken ct)
+{
+        if (!string.IsNullOrWhiteSpace(statusFilter) &&
+            !ValidStatuses.Contains(statusFilter))
+            throw new ArgumentException(
+                "Status filter must be Open, Assigned, or Completed.");
+
+        var records = await _repo.GetAllAsync(statusFilter, ct);
+        return records.Select(ToResponse).ToList();
+}
 
     // public Task<ReliefRequestResponse> UpdateAsync(
     //     Guid requestId, ReliefRequestUpdateRequest request, CancellationToken ct)

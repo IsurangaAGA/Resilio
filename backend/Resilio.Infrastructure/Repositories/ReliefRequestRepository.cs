@@ -37,13 +37,50 @@ public sealed class ReliefRequestRepository : IReliefRequestRepository
     }
 
     // for now its not implemented
-    public Task<IReadOnlyList<ReliefRequestRecord>> GetAllAsync(
-        string? statusFilter, CancellationToken ct)
-        => throw new NotImplementedException();
+    public async Task<IReadOnlyList<ReliefRequestRecord>> GetAllAsync(
+    string? statusFilter, CancellationToken ct)
+{
+    var sql = "SELECT RequestId, CreatedByUserId, Area, Description, " +
+              "Urgency, Status, CreatedAt, UpdatedAt " +
+              "FROM dbo.ReliefRequests";
 
-    public Task<ReliefRequestRecord?> GetByIdAsync(
-        Guid requestId, CancellationToken ct)
-        => throw new NotImplementedException();
+    if (!string.IsNullOrWhiteSpace(statusFilter))
+        sql += " WHERE Status = @Status";
+
+    sql += " ORDER BY CreatedAt DESC;";
+
+    using var conn = (SqlConnection)_factory.CreateConnection();
+    await conn.OpenAsync(ct);
+    using var cmd = new SqlCommand(sql, conn);
+
+    if (!string.IsNullOrWhiteSpace(statusFilter))
+        cmd.Parameters.AddWithValue("@Status", statusFilter);
+
+    using var reader = await cmd.ExecuteReaderAsync(ct);
+    var list = new List<ReliefRequestRecord>();
+    while (await reader.ReadAsync(ct))
+        list.Add(MapRow(reader));
+
+    return list;
+}
+
+    public async Task<ReliefRequestRecord?> GetByIdAsync(
+    Guid requestId, CancellationToken ct)
+{
+    const string sql =
+        "SELECT RequestId, CreatedByUserId, Area, Description, " +
+        "Urgency, Status, CreatedAt, UpdatedAt " +
+        "FROM dbo.ReliefRequests WHERE RequestId = @Id;";
+
+    using var conn = (SqlConnection)_factory.CreateConnection();
+    await conn.OpenAsync(ct);
+    using var cmd = new SqlCommand(sql, conn);
+    cmd.Parameters.AddWithValue("@Id", requestId);
+
+    using var reader = await cmd.ExecuteReaderAsync(ct);
+    if (!await reader.ReadAsync(ct)) return null;
+    return MapRow(reader);
+}
 
     public Task<ReliefRequestRecord> UpdateAsync(
         ReliefRequestRecord record, CancellationToken ct)
@@ -51,4 +88,15 @@ public sealed class ReliefRequestRepository : IReliefRequestRepository
 
     public Task DeleteAsync(Guid requestId, CancellationToken ct)
         => throw new NotImplementedException();
+
+    private static ReliefRequestRecord MapRow(SqlDataReader r) => new(
+        RequestId:       r.GetGuid(0),
+        CreatedByUserId: r.GetGuid(1),
+        Area:            r.GetString(2),
+        Description:     r.IsDBNull(3) ? null : r.GetString(3),
+        Urgency:         r.GetString(4),
+        Status:          r.GetString(5),
+        CreatedAt:       r.GetDateTime(6),
+        UpdatedAt:       r.GetDateTime(7)
+);
 }

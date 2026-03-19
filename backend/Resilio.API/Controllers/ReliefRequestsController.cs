@@ -35,6 +35,23 @@ public sealed class ReliefRequestsController : ControllerBase
         }
     }
 
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyList<ReliefRequestResponse>>> GetAll(
+        [FromQuery] string? status, CancellationToken ct)
+    {
+        try
+        {
+            return Ok(await _service.GetAllAsync(status, ct));
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Title  = "Validation error",
+                Detail = ex.Message
+            });
+        }
+    }
     private Guid GetUserId()
     {
         var sub = User.FindFirstValue(ClaimTypes.NameIdentifier)
