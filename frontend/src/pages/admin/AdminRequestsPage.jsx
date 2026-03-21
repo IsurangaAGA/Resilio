@@ -57,6 +57,15 @@ export default function AdminRequestsPage() {
             setEditLoading(false);
         }
     };
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this request?')) return;
+        try {
+            await reliefRequestsApi.delete(id);
+            load(filter);
+        } catch (err) {
+            alert(err.response?.data?.detail ?? 'Delete failed.');
+        }
+    };
 
     useEffect(() => load(filter), [filter]);
 
@@ -129,7 +138,6 @@ export default function AdminRequestsPage() {
                                             <td style={{ ...td, color: '#999', fontSize: 12 }}>
                                                 {new Date(r.createdAt).toLocaleDateString()}
                                             </td>
-                                            {/* ← Added Actions column */}
                                             <td style={td}>
                                                 {r.status !== 'Completed' && (
                                                     <button style={editBtn}
@@ -137,6 +145,14 @@ export default function AdminRequestsPage() {
                                                         Edit
                                                     </button>
                                                 )}
+                                    
+                                                {r.status === 'Open' && (
+                                                    <button style={delBtn}
+                                                        onClick={() => handleDelete(r.requestId)}>
+                                                        Delete
+                                                    </button>
+                                                )}
+
                                             </td>
                                         </tr>
                                     ))}
@@ -148,7 +164,7 @@ export default function AdminRequestsPage() {
                 </div>
             </div>
 
-            {/* edit model */}
+            {/*edit modal*/}
             {editing && (
                 <div style={overlay}>
                     <div style={modal}>
@@ -232,8 +248,6 @@ const tr        = { borderBottom: '1px solid #f5f5f5' };
 const td        = { padding: '12px 14px', verticalAlign: 'top' };
 const badge     = { fontSize: 11, fontWeight: 700, padding: '4px 12px',
                     borderRadius: 20, whiteSpace: 'nowrap' };
-
-// ← New styles added below
 const editBtn   = { padding: '5px 14px', borderRadius: 8,
                     border: '1px solid #ddd', background: '#fff',
                     cursor: 'pointer', fontSize: 12 };
@@ -258,3 +272,9 @@ const secBtn    = { padding: '10px 18px', borderRadius: 10,
                     border: '1.5px solid #e8e8e8', background: '#fff',
                     color: '#555', cursor: 'pointer', fontSize: 13,
                     fontFamily: "'Segoe UI', Inter, sans-serif" };
+//delete button
+const delBtn    = { padding: '5px 14px', borderRadius: 8,
+                    border: '1px solid #fcc',
+                    background: '#fff0f0', color: '#c0392b',
+                    cursor: 'pointer', fontSize: 12,
+                    marginLeft: 6 };
