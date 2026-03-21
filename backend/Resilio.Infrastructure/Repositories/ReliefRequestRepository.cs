@@ -1,4 +1,3 @@
-// Resilio.Infrastructure/Repositories/ReliefRequestRepository.cs
 using Microsoft.Data.SqlClient;
 using Resilio.Core.Interfaces;
 
@@ -36,7 +35,6 @@ public sealed class ReliefRequestRepository : IReliefRequestRepository
         return record;
     }
 
-    // for now its not implemented
     public async Task<IReadOnlyList<ReliefRequestRecord>> GetAllAsync(
     string? statusFilter, CancellationToken ct)
 {
@@ -82,9 +80,29 @@ public sealed class ReliefRequestRepository : IReliefRequestRepository
     return MapRow(reader);
 }
 
-    public Task<ReliefRequestRecord> UpdateAsync(
-        ReliefRequestRecord record, CancellationToken ct)
-        => throw new NotImplementedException();
+    public async Task<ReliefRequestRecord> UpdateAsync(
+    ReliefRequestRecord record, CancellationToken ct)
+{
+    const string sql = @"
+        UPDATE dbo.ReliefRequests
+        SET Area        = @Area,
+            Description = @Desc,
+            Urgency     = @Urgency,
+            UpdatedAt   = SYSDATETIME()
+        WHERE RequestId = @Id;";
+
+    using var conn = (SqlConnection)_factory.CreateConnection();
+    await conn.OpenAsync(ct);
+    using var cmd = new SqlCommand(sql, conn);
+
+    cmd.Parameters.AddWithValue("@Id",      record.RequestId);
+    cmd.Parameters.AddWithValue("@Area",    record.Area);
+    cmd.Parameters.AddWithValue("@Desc",    (object?)record.Description ?? DBNull.Value);
+    cmd.Parameters.AddWithValue("@Urgency", record.Urgency);
+
+    await cmd.ExecuteNonQueryAsync(ct);
+    return record;
+}
 
     public Task DeleteAsync(Guid requestId, CancellationToken ct)
         => throw new NotImplementedException();

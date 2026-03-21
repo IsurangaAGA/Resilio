@@ -52,6 +52,41 @@ public sealed class ReliefRequestsController : ControllerBase
             });
         }
     }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<ReliefRequestResponse>> Update(
+        Guid id, [FromBody] ReliefRequestUpdateRequest request,
+        CancellationToken ct)
+    {
+        try
+        {
+            return Ok(await _service.UpdateAsync(id, request, ct));
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Title = "Not found"
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return StatusCode(403, new ProblemDetails
+            {
+                Title  = "Forbidden",
+                Detail = ex.Message
+            });
+        }
+    catch (ArgumentException ex)
+    {
+        return BadRequest(new ProblemDetails
+        {
+            Title  = "Validation error",
+            Detail = ex.Message
+        });
+    }
+}
+
     private Guid GetUserId()
     {
         var sub = User.FindFirstValue(ClaimTypes.NameIdentifier)

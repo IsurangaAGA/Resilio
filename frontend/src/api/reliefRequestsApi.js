@@ -8,5 +8,7 @@ export const reliefRequestsApi = {
             params: status ? { status } : {},
         }),
 
-    // update delete, -for later
+    update:  (id, data) => http.put(`/api/relief-requests/${id}`, data),
+    
+    // delete, -for later
 };

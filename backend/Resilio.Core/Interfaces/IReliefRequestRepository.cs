@@ -1,4 +1,3 @@
-// Resilio.Core/Interfaces/IReliefRequestRepository.cs
 namespace Resilio.Core.Interfaces;
 
 public sealed record ReliefRequestRecord(
@@ -20,11 +19,11 @@ public interface IReliefRequestRepository
     Task<IReadOnlyList<ReliefRequestRecord>> GetAllAsync(
         string? statusFilter, CancellationToken ct);
 
-    // Task<ReliefRequestRecord?> GetByIdAsync(
-    //     Guid requestId, CancellationToken ct);
+    Task<ReliefRequestRecord?> GetByIdAsync(
+        Guid requestId, CancellationToken ct);
 
-    // Task<ReliefRequestRecord> UpdateAsync(
-    //     ReliefRequestRecord record, CancellationToken ct);
+    Task<ReliefRequestRecord> UpdateAsync(
+        ReliefRequestRecord record, CancellationToken ct);
 
     // Task DeleteAsync(Guid requestId, CancellationToken ct);
 }

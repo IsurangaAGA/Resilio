@@ -4,6 +4,7 @@ import AppHeader from '../../components/AppHeader/AppHeader';
 import { reliefRequestsApi } from '../../api/reliefRequestsApi';
 
 const STATUSES = ['All', 'Open', 'Assigned', 'Completed'];
+const URGENCY  = ['Low', 'Medium', 'High', 'Critical'];
 
 const COLORS = {
     Open:      { bg: '#e8f5e9', color: '#2e7d32' },
@@ -13,10 +14,14 @@ const COLORS = {
 
 export default function AdminRequestsPage() {
     const nav = useNavigate();
-    const [requests, setRequests] = useState([]);
-    const [filter, setFilter]     = useState('All');
-    const [loading, setLoading]   = useState(true);
-    const [error, setError]       = useState(null);
+    const [requests,    setRequests]    = useState([]);
+    const [filter,      setFilter]      = useState('All');
+    const [loading,     setLoading]     = useState(true);
+    const [error,       setError]       = useState(null);
+    const [editing,     setEditing]     = useState(null);
+    const [editForm,    setEditForm]    = useState({});
+    const [editErr,     setEditErr]     = useState(null);
+    const [editLoading, setEditLoading] = useState(false);
 
     const load = (status) => {
         setLoading(true); setError(null);
@@ -24,6 +29,33 @@ export default function AdminRequestsPage() {
             .then(r => setRequests(r.data))
             .catch(() => setError('Failed to load requests.'))
             .finally(() => setLoading(false));
+    };
+
+    const openEdit = (r) => {
+        setEditing(r);
+        setEditForm({
+            area:        r.area,
+            description: r.description ?? '',
+            urgency:     r.urgency
+        });
+        setEditErr(null);
+    };
+
+    const saveEdit = async () => {
+        setEditLoading(true); setEditErr(null);
+        try {
+            await reliefRequestsApi.update(editing.requestId, {
+                area:        editForm.area        || null,
+                description: editForm.description || null,
+                urgency:     editForm.urgency     || null,
+            });
+            setEditing(null);
+            load(filter);
+        } catch (err) {
+            setEditErr(err.response?.data?.detail ?? 'Update failed.');
+        } finally {
+            setEditLoading(false);
+        }
     };
 
     useEffect(() => load(filter), [filter]);
@@ -76,7 +108,7 @@ export default function AdminRequestsPage() {
                                 <thead>
                                     <tr>
                                         {['Area', 'Description', 'Urgency',
-                                          'Status', 'Created'].map(h => (
+                                          'Status', 'Created', 'Actions'].map(h => (
                                             <th key={h} style={th}>{h}</th>
                                         ))}
                                     </tr>
@@ -84,26 +116,27 @@ export default function AdminRequestsPage() {
                                 <tbody>
                                     {requests.map(r => (
                                         <tr key={r.requestId} style={tr}>
-                                            <td style={td}>
-                                                <b>{r.area}</b>
-                                            </td>
-                                            <td style={{ ...td, color: '#666',
-                                                maxWidth: 200 }}>
+                                            <td style={td}><b>{r.area}</b></td>
+                                            <td style={{ ...td, color: '#666', maxWidth: 200 }}>
                                                 {r.description ?? '—'}
                                             </td>
                                             <td style={td}>{r.urgency}</td>
                                             <td style={td}>
-                                                <span style={{
-                                                    ...badge,
-                                                    ...COLORS[r.status]
-                                                }}>
+                                                <span style={{ ...badge, ...COLORS[r.status] }}>
                                                     {r.status}
                                                 </span>
                                             </td>
-                                            <td style={{ ...td, color: '#999',
-                                                fontSize: 12 }}>
-                                                {new Date(r.createdAt)
-                                                    .toLocaleDateString()}
+                                            <td style={{ ...td, color: '#999', fontSize: 12 }}>
+                                                {new Date(r.createdAt).toLocaleDateString()}
+                                            </td>
+                                            {/* ← Added Actions column */}
+                                            <td style={td}>
+                                                {r.status !== 'Completed' && (
+                                                    <button style={editBtn}
+                                                        onClick={() => openEdit(r)}>
+                                                        Edit
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
@@ -114,11 +147,58 @@ export default function AdminRequestsPage() {
 
                 </div>
             </div>
+
+            {/* edit model */}
+            {editing && (
+                <div style={overlay}>
+                    <div style={modal}>
+                        <h3 style={{ marginTop: 0 }}>Edit Request</h3>
+
+                        <label style={lbl}>Area</label>
+                        <input
+                            value={editForm.area}
+                            onChange={e => setEditForm(p => ({ ...p, area: e.target.value }))}
+                            style={inp}
+                        />
+
+                        <label style={lbl}>Description</label>
+                        <textarea
+                            value={editForm.description}
+                            rows={3}
+                            onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))}
+                            style={{ ...inp, resize: 'vertical' }}
+                        />
+
+                        <label style={lbl}>Urgency</label>
+                        <select
+                            value={editForm.urgency}
+                            onChange={e => setEditForm(p => ({ ...p, urgency: e.target.value }))}
+                            style={inp}>
+                            {URGENCY.map(u => <option key={u}>{u}</option>)}
+                        </select>
+
+                        {editErr && (
+                            <p style={{ color: '#c0392b', fontSize: 13 }}>{editErr}</p>
+                        )}
+
+                        <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+                            <button style={primBtn} onClick={saveEdit}
+                                disabled={editLoading}>
+                                {editLoading ? 'Saving...' : 'Save'}
+                            </button>
+                            <button style={secBtn} onClick={() => setEditing(null)}
+                                disabled={editLoading}>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
 
-// styles
+//styles
 const pageWrap  = { minHeight: '100vh', background: '#f5f6fa',
                     display: 'flex', justifyContent: 'center',
                     padding: '48px 16px',
@@ -152,6 +232,28 @@ const tr        = { borderBottom: '1px solid #f5f5f5' };
 const td        = { padding: '12px 14px', verticalAlign: 'top' };
 const badge     = { fontSize: 11, fontWeight: 700, padding: '4px 12px',
                     borderRadius: 20, whiteSpace: 'nowrap' };
+
+// ← New styles added below
+const editBtn   = { padding: '5px 14px', borderRadius: 8,
+                    border: '1px solid #ddd', background: '#fff',
+                    cursor: 'pointer', fontSize: 12 };
+const overlay   = { position: 'fixed', inset: 0,
+                    background: 'rgba(0,0,0,0.4)',
+                    display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', zIndex: 1000 };
+const modal     = { background: '#fff', borderRadius: 16,
+                    padding: 28, width: '100%', maxWidth: 460,
+                    boxShadow: '0 8px 40px rgba(0,0,0,0.18)' };
+const lbl       = { display: 'block', fontSize: 13,
+                    fontWeight: 600, marginBottom: 6, marginTop: 14 };
+const inp       = { width: '100%', padding: '10px 12px',
+                    borderRadius: 10, border: '1px solid #ddd',
+                    fontSize: 14, boxSizing: 'border-box',
+                    fontFamily: "'Segoe UI', Inter, sans-serif" };
+const primBtn   = { flex: 1, padding: 11, borderRadius: 10,
+                    border: 'none', background: '#1a1a2e',
+                    color: '#fff', cursor: 'pointer', fontSize: 14,
+                    fontFamily: "'Segoe UI', Inter, sans-serif" };
 const secBtn    = { padding: '10px 18px', borderRadius: 10,
                     border: '1.5px solid #e8e8e8', background: '#fff',
                     color: '#555', cursor: 'pointer', fontSize: 13,

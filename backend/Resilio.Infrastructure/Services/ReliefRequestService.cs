@@ -1,4 +1,3 @@
-// Resilio.API/Services/ReliefRequestService.cs
 using Resilio.Core.DTOs;
 using Resilio.Core.Interfaces;
 
@@ -56,10 +55,34 @@ public sealed class ReliefRequestService : IReliefRequestService
         return records.Select(ToResponse).ToList();
 }
 
-    // public Task<ReliefRequestResponse> UpdateAsync(
-    //     Guid requestId, ReliefRequestUpdateRequest request, CancellationToken ct)
-    //     => throw new NotImplementedException();
+    //edit
+    public async Task<ReliefRequestResponse> UpdateAsync(
+    Guid id, ReliefRequestUpdateRequest req, CancellationToken ct)
+{
+    // fetch existing record
+    var existing = await _repo.GetByIdAsync(id, ct)
+        ?? throw new KeyNotFoundException("Relief request not found.");
 
+    // can't edit a Completed request
+    if (existing.Status == "Completed")
+        throw new InvalidOperationException(
+            "Cannot edit a Completed relief request.");
+
+    // validate urgency if provided
+    if (req.Urgency is not null && !ValidUrgencies.Contains(req.Urgency))
+        throw new ArgumentException(
+            "Urgency must be Low, Medium, High, or Critical.");
+
+    // only update fields that were sent
+    var updated = existing with {
+        Area        = req.Area?.Trim()        ?? existing.Area,
+        Description = req.Description?.Trim() ?? existing.Description,
+        Urgency     = req.Urgency             ?? existing.Urgency,
+        UpdatedAt   = DateTime.UtcNow
+    };
+
+    return ToResponse(await _repo.UpdateAsync(updated, ct));
+}
     // public Task DeleteAsync(Guid requestId, CancellationToken ct)
     //     => throw new NotImplementedException();
 
