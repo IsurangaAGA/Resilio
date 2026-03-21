@@ -13,6 +13,9 @@ export default function VictimDashboard() {
       <button style={primaryBtn} onClick={() => nav('/victim/new-request')}>
       Request Help
       </button>
+      <button style={primaryBtn} onClick={() => nav('/victim/my-requests')}>
+      View My Requests
+      </button>
 
       <button
         style={secondaryBtn}

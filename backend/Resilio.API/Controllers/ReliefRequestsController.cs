@@ -113,6 +113,20 @@ public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     }
 }
 
+// Victim only
+[HttpGet("mine")]
+[Authorize(Roles = "Victim")]
+public async Task<IActionResult> GetMine(CancellationToken ct)
+{
+    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
+        ?? User.FindFirstValue("sub");
+
+    if (!Guid.TryParse(userIdClaim, out var userId))
+        return Unauthorized();
+
+    var result = await _service.GetByUserAsync(userId, ct);
+    return Ok(result);
+}
     private Guid GetUserId()
     {
         var sub = User.FindFirstValue(ClaimTypes.NameIdentifier)

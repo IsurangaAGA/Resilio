@@ -26,4 +26,7 @@ public interface IReliefRequestRepository
         ReliefRequestRecord record, CancellationToken ct);
 
     Task DeleteAsync(Guid requestId, CancellationToken ct);
+
+    Task<IReadOnlyList<ReliefRequestRecord>> GetByUserIdAsync(
+    Guid userId, CancellationToken ct);
 }

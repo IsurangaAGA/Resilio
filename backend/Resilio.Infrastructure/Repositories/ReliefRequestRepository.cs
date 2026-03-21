@@ -127,4 +127,28 @@ public sealed class ReliefRequestRepository : IReliefRequestRepository
         CreatedAt:       r.GetDateTime(6),
         UpdatedAt:       r.GetDateTime(7)
 );
+
+
+public async Task<IReadOnlyList<ReliefRequestRecord>> GetByUserIdAsync(
+    Guid userId, CancellationToken ct)
+{
+    const string sql =
+        "SELECT RequestId, CreatedByUserId, Area, Description, " +
+        "Urgency, Status, CreatedAt, UpdatedAt " +
+        "FROM dbo.ReliefRequests " +
+        "WHERE CreatedByUserId = @UserId " +
+        "ORDER BY CreatedAt DESC;";
+
+    using var conn = (SqlConnection)_factory.CreateConnection();
+    await conn.OpenAsync(ct);
+    using var cmd = new SqlCommand(sql, conn);
+    cmd.Parameters.AddWithValue("@UserId", userId);
+
+    using var reader = await cmd.ExecuteReaderAsync(ct);
+    var list = new List<ReliefRequestRecord>();
+    while (await reader.ReadAsync(ct))
+        list.Add(MapRow(reader));
+
+    return list;
+}
 }

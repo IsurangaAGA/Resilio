@@ -15,4 +15,7 @@ public interface IReliefRequestService
 
     Task DeleteAsync(Guid requestId, CancellationToken ct);
 
+    Task<IReadOnlyList<ReliefRequestResponse>> GetByUserAsync(
+    Guid userId, CancellationToken ct);
+
 }

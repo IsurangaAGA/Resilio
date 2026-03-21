@@ -99,6 +99,13 @@ public sealed class ReliefRequestService : IReliefRequestService
     await _repo.DeleteAsync(requestId, ct);
 }
 
+public async Task<IReadOnlyList<ReliefRequestResponse>> GetByUserAsync(
+    Guid userId, CancellationToken ct)
+{
+    var records = await _repo.GetByUserIdAsync(userId, ct);
+    return records.Select(ToResponse).ToList();
+}
+
     private static ReliefRequestResponse ToResponse(ReliefRequestRecord r) => new(
         r.RequestId, r.CreatedByUserId, r.Area, r.Description,
         r.Urgency, r.Status, r.CreatedAt, r.UpdatedAt);

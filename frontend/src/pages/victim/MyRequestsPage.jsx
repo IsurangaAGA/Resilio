@@ -17,7 +17,7 @@ export default function MyRequestsPage() {
     const [error, setError]         = useState(null);
 
     useEffect(() => {
-        reliefRequestsApi.getAll()
+        reliefRequestsApi.getMyRequests()
             .then(r => setRequests(r.data))
             .catch(() => setError('Failed to load requests.'))
             .finally(() => setLoading(false));
