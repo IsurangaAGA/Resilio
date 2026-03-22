@@ -13,9 +13,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Resilio.sln
 
       - name: Build & Publish
         run: dotnet publish backend/Resilio.API/Resilio.API.csproj -c Release -o ${{github.workspace}}/publish
